@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.publicholiday.utilities.NetworkUtils;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +23,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 
-public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.CountriesAdapterViewHolder> {
+public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.CountriesAdapterViewHolder>
+            implements FastScrollRecyclerView.SectionedAdapter {
 
     private static final String TAG = CountriesAdapter.class.getSimpleName();
 
@@ -133,6 +135,12 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
 
         return mCountriesList.length;
 
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return String.valueOf(mCountriesList[position].charAt(0));
     }
 
     /**
