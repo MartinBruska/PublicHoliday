@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,19 +23,56 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.CountriesAdapterViewHolder>
-            implements FastScrollRecyclerView.SectionedAdapter {
+            implements FastScrollRecyclerView.SectionedAdapter, Filterable {
 
     private static final String TAG = CountriesAdapter.class.getSimpleName();
 
    //private String[] mCountriesList={"andora", "australia"};
     private String [] mCountriesList;
+    private String [] mFilteredCountriesList;
 
 
     private final CountriesAdapterOnClickHandler mClickHandler;
 
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString=charSequence.toString();
+                if(charString.isEmpty()){
+                    mFilteredCountriesList=mCountriesList;
+                }
+                else{
+                    ArrayList<String> filteredList=new ArrayList<String>();
+                    for(String row : mCountriesList){
+                        if(row.toLowerCase().contains(charString.toLowerCase()))
+                            filteredList.add(row);
+
+                    }
+                    String[] filteredListHelp=new String[filteredList.size()];
+                    filteredListHelp=filteredList.toArray(filteredListHelp);
+                    mFilteredCountriesList=filteredListHelp;
+                }
+
+                FilterResults filterResults=new FilterResults();
+                filterResults.values=mFilteredCountriesList;
+                return filterResults;
+
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults results) {
+                mFilteredCountriesList=(String[]) results.values;
+                notifyDataSetChanged();
+
+            }
+        };
+    }
 
 
     /**
@@ -52,6 +91,7 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
     public CountriesAdapter(CountriesAdapterOnClickHandler clickHandler, String[] countries) {
         mClickHandler = clickHandler;
         mCountriesList=countries;
+        mFilteredCountriesList=countries;
 
     }
 
@@ -79,7 +119,7 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
          */@Override
         public void onClick(View v) {
              int adapterPosition=getAdapterPosition();
-             String countryName=mCountriesList[adapterPosition];
+             String countryName=mFilteredCountriesList[adapterPosition];
              mClickHandler.onClick(countryName);
 
         }
@@ -119,7 +159,7 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
      * @param position                  The position of the item within the adapter's data set.
      */@Override
     public void onBindViewHolder(CountriesAdapterViewHolder holder, int position) {
-         String country=mCountriesList[position];
+         String country=mFilteredCountriesList[position];
          holder.mCountriesTextView.setText(country);
 
     }
@@ -131,16 +171,16 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
      * @return The number of items available in country list
      */@Override
     public int getItemCount() {
-        if(null == mCountriesList) return 0;
+        if(null == mFilteredCountriesList) return 0;
 
-        return mCountriesList.length;
+        return mFilteredCountriesList.length;
 
     }
 
     @NonNull
     @Override
     public String getSectionName(int position) {
-        return String.valueOf(mCountriesList[position].charAt(0));
+        return String.valueOf(mFilteredCountriesList[position].charAt(0));
     }
 
     /**
@@ -153,7 +193,7 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
      * ___Looks like useless for my solution */
 
     public void setCountryData(String[] countryList) {
-        mCountriesList = countryList;
+        mFilteredCountriesList = countryList;
         notifyDataSetChanged();
     }
 

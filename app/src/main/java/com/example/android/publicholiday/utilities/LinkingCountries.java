@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -28,6 +29,7 @@ public final class LinkingCountries {
             file =context.getResources().openRawResource(R.raw.countries_name);
             reader = new BufferedReader(new InputStreamReader(file));
             String line = reader.readLine();
+            listOfCountries.add(line);
             while(line != null){
                 Log.d("StackOverflow", line);
                 line = reader.readLine();
@@ -44,6 +46,7 @@ public final class LinkingCountries {
                 file = context.getResources().openRawResource(R.raw.country_code);
                 reader = new BufferedReader(new InputStreamReader(file));
                 String line = reader.readLine();
+                listOfCountries.add(line);
                 while (line != null) {
                     Log.d("StackOverflow", line);
                     line = reader.readLine();
@@ -56,7 +59,7 @@ public final class LinkingCountries {
                 ioe.printStackTrace();
             }
         }
-
+        listOfCountries.removeAll(Collections.singleton(null));
         String[] countries=new String[listOfCountries.size()];
         countries=listOfCountries.toArray(countries);
 

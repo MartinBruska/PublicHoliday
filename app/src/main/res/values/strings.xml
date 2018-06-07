@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">PublicHoliday</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <!-- TODO(1) REFRESH does not exist in my app, fix it-->
     <string name="error_message">An error has occurred. Please try again by clicking REFRESH</string>
+    <string name="search_hint">Type country…</string>
 
 </resources>
