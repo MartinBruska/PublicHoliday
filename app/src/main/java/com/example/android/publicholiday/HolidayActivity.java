@@ -230,6 +230,7 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
 
     }
 
+
     private String getCountryCode(String country){
         String[] countries=LinkingCountries.countryReader(this,"countries_name");
         String[] codes=LinkingCountries.countryReader(this,"country_code");

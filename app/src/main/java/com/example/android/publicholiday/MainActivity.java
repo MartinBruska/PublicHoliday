@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,8 +16,13 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Toast;
 import android.support.v7.widget.SearchView;
+
 
 import com.example.android.publicholiday.utilities.LinkingCountries;
 
@@ -30,6 +36,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements CountriesAdapter.CountriesAdapterOnClickHandler {
 
@@ -37,13 +44,19 @@ public class MainActivity extends AppCompatActivity implements CountriesAdapter.
 
     private RecyclerView mRecycleView;
     private SearchView searchView;
+    private MenuItem searchMenuItem;
+    private FloatingActionButton fab;
+    private boolean mIsHiding=false;
 
     private CountriesAdapter mCountriesAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        
         /*
          * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
          * do things like set the adapter of the RecyclerView and toggle the visibility.
@@ -69,23 +82,58 @@ public class MainActivity extends AppCompatActivity implements CountriesAdapter.
          * The CountriesAdapter is responsible for linking our country data with the Views that
          * will end up displaying our country list.
          */
-        mCountriesAdapter = new CountriesAdapter(this, LinkingCountries.countryReader(this,"countries_name"));
+        mCountriesAdapter = new CountriesAdapter(this,this, LinkingCountries.countryReader(this,"countries_name"));
 
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mRecycleView.setAdapter(mCountriesAdapter);
 
 
 
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.show();
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+
+
+                searchMenuItem.expandActionView();
+
+
+
             }
         });
+
+
+        // The important part is attaching an OnScrollListener
+        // to our RecyclerView. This object will listen
+        // if RecyclerView is dragged (scroll or fling action) or idle
+        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                // While RecyclerView enters dragging state
+                // (scroll, fling) we want our FAB to disappear.
+                // Similarly when it enters idle state we want
+                // our FAB to appear back.
+                if (newState == recyclerView.SCROLL_STATE_DRAGGING) {
+                    // Hiding FAB
+
+                    fab.hide();
+
+
+                } else if (newState == recyclerView.SCROLL_STATE_IDLE) {
+                    // Showing FAB
+
+                   fab.show();
+
+                }
+            }
+
+
+        });
+
     }
 
     @Override
@@ -95,8 +143,11 @@ public class MainActivity extends AppCompatActivity implements CountriesAdapter.
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search)
-                .getActionView();
+        searchMenuItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchMenuItem.getActionView();
+
+
+
 
         searchView.setSearchableInfo(searchManager
                 .getSearchableInfo(getComponentName()));
@@ -136,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements CountriesAdapter.
             return true;
         }
 
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -156,5 +208,8 @@ public class MainActivity extends AppCompatActivity implements CountriesAdapter.
         startActivity(holidayDetailsIntent);
 
     }
+
+
+
 
 }

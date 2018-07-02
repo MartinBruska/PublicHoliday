@@ -30,6 +30,7 @@ public class HolidaysAdapter extends RecyclerView.Adapter<HolidaysAdapter.Holida
         String holidayDetails=mHolidayData[position];
         holder.mHolidayTextView.setText(holidayDetails);
 
+
     }
 
     @Override

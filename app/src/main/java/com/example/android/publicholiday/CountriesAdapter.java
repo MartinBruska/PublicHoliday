@@ -2,6 +2,9 @@ package com.example.android.publicholiday;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,13 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+
 import com.example.android.publicholiday.utilities.NetworkUtils;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScroller;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +41,8 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
    //private String[] mCountriesList={"andora", "australia"};
     private String [] mCountriesList;
     private String [] mFilteredCountriesList;
+    private Context mContext;
+
 
 
     private final CountriesAdapterOnClickHandler mClickHandler;
@@ -88,7 +97,8 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
      * @param clickHandler The on-click handler for this adapter. This single handler is called
      *                     when an item is clicked.
      */
-    public CountriesAdapter(CountriesAdapterOnClickHandler clickHandler, String[] countries) {
+    public CountriesAdapter(Context context,CountriesAdapterOnClickHandler clickHandler, String[] countries) {
+        mContext=context;
         mClickHandler = clickHandler;
         mCountriesList=countries;
         mFilteredCountriesList=countries;
@@ -102,12 +112,14 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
     public class CountriesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public final TextView mCountriesTextView;
+        public final ImageView mCountriesFlagImageView;
 
 
 
         public CountriesAdapterViewHolder(View itemView) {
             super(itemView);
             this.mCountriesTextView = itemView.findViewById(R.id.tv_country_name);
+            this.mCountriesFlagImageView=itemView.findViewById(R.id.iv_country_flag);
             itemView.setOnClickListener(this);
         }
 
@@ -162,6 +174,25 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
          String country=mFilteredCountriesList[position];
          holder.mCountriesTextView.setText(country);
 
+         String imageNameNew=country.replaceAll("[^\\w]", "")
+                                    .replaceAll("[é,Ã§]","")
+                                    .toLowerCase();
+
+         Log.v("TestImageName",imageNameNew);
+
+
+         String imageName=imageNameNew;
+         int picID=mContext.getResources().getIdentifier(imageName,"drawable","com.example.android.publicholiday");
+
+         holder.mCountriesFlagImageView.setImageResource(picID);
+
+
+
+
+
+
+
+
     }
 
     /**
@@ -196,6 +227,10 @@ public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.Coun
         mFilteredCountriesList = countryList;
         notifyDataSetChanged();
     }
+
+
+
+
 
 
 }
