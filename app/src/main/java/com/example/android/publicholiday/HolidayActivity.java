@@ -1,10 +1,10 @@
 package com.example.android.publicholiday;
 
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -13,22 +13,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.android.publicholiday.HolidayDay;
+import com.example.android.publicholiday.HolidaysAdapter;
+import com.example.android.publicholiday.R;
+import com.example.android.publicholiday.utilities.DateUtils;
 import com.example.android.publicholiday.utilities.LinkingCountries;
 import com.example.android.publicholiday.utilities.NetworkUtils;
 import com.example.android.publicholiday.utilities.OpenHolidaysJSONUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class HolidayActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String[]> {
+public class HolidayActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<HolidayDay>> {
 
     private static final String TAG = HolidayActivity.class.getSimpleName();
 
@@ -36,6 +43,8 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
     private TextView mErrorMessageDisplay;
     private HolidaysAdapter mHolidaysAdapter;
     private RecyclerView mRecyclerView;
+    private Map<String,ArrayList<HolidayDay>> dataFilteredByYear;
+
 
     private ProgressBar mLoadingIndicator;
 
@@ -45,6 +54,9 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.country_holidays_detail);
+
+
+
 
 
 
@@ -90,7 +102,7 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
          * to the call to initLoader below. This means that whenever the loaderManager has
          * something to notify us of, it will do so through this callback.
          */
-        LoaderManager.LoaderCallbacks<String[]> callback=HolidayActivity.this;
+        LoaderManager.LoaderCallbacks<ArrayList<HolidayDay>> callback=HolidayActivity.this;
 
         /*
          * The second parameter of the initLoader method below is a Bundle. Optionally, you can
@@ -118,11 +130,11 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
      * @return Return a new Loader instance that is ready to start loading.
      */
     @Override
-    public Loader<String[]> onCreateLoader(int id, Bundle loaderArgs) {
-        return new AsyncTaskLoader<String[]>(this) {
+    public Loader<ArrayList<HolidayDay>> onCreateLoader(int id, Bundle loaderArgs) {
+        return new AsyncTaskLoader<ArrayList<HolidayDay>>(this) {
 
             /* This String array will hold and help cache our holidays data */
-            String[] mHolidaysData = null;
+            ArrayList<HolidayDay> mHolidaysData = null;
             /**
              * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
              */
@@ -140,11 +152,11 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
              * This is the method of the AsyncTaskLoader that will load and parse the JSON data
              * from GoogleCalendar in the background.
              *
-             * @return Holidays data from Google calendar as an array of Strings.
+             * @return Holidays data from Google calendar as an arraylist of HolidayDay objects.
              *         null if an error occurs
              */
             @Override
-            public String[] loadInBackground() {
+            public ArrayList<HolidayDay> loadInBackground() {
 
                 URL holidayRequestUrl = NetworkUtils.buildUrl(getCountryCode(mCountry));
 
@@ -154,7 +166,7 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
 
 
 
-                    String[] simpleJsonHolidayData = OpenHolidaysJSONUtils.getHolidaysFromJson(HolidayActivity.this,jsonHolidayResponse);
+                    ArrayList<HolidayDay> simpleJsonHolidayData = OpenHolidaysJSONUtils.getHolidaysFromJson(HolidayActivity.this,jsonHolidayResponse);
 
 
                     return simpleJsonHolidayData;
@@ -170,7 +182,7 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
              *
              * @param data The result of the load
              */
-            public void deliverResult(String[] data) {
+            public void deliverResult(ArrayList<HolidayDay> data) {
                 mHolidaysData = data;
                 super.deliverResult(data);
             }
@@ -184,9 +196,61 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
      * @param data The data generated by the Loader.
      */
     @Override
-    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+    public void onLoadFinished(Loader<ArrayList<HolidayDay>> loader, ArrayList<HolidayDay> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        mHolidaysAdapter.setHolidayData(data);
+        //getting system year
+        Calendar calendar= Calendar.getInstance();
+        int cYear=calendar.get(Calendar.YEAR);
+        //sort the data based on year
+        dataFilteredByYear= DateUtils.holidaysSortingByYear(data);
+        //set data for recyclerview by system year
+        mHolidaysAdapter.setHolidayData(dataFilteredByYear.get(String.valueOf(cYear)));
+        //find the linear layout for buttons
+        LinearLayout buttonLayout=(LinearLayout) findViewById(R.id.ll_button_row);
+        //creating new buttons based on keyset and seting onclicklistener on them
+        if(dataFilteredByYear.keySet()!=null) {
+            for (final String year : dataFilteredByYear.keySet()) {
+                final Button button = new Button(this);
+                button.setText(year);
+                button.setTag(year);
+
+
+                //change color of button which was chosen automatically base ond system year
+                if(button.getText().equals(String.valueOf(cYear))){
+                    button.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                }
+                button.setOnClickListener(new View.OnClickListener() {
+                    boolean click=true;
+                    @Override
+                    public void onClick(View v) {
+                        mHolidaysAdapter.setHolidayData(dataFilteredByYear.get(year));
+                        if(click){
+                            button.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                            click=false;
+                        } else {
+                            button.setBackgroundColor(Color.WHITE);
+                            click=true;
+                        }
+
+
+
+                    }
+                });
+                buttonLayout.addView(button);
+                }
+        }
+
+        //
+        //TODO(2) can't see last row of recycelrview-fix it
+
+        //TODO(4) year button in different color after clicking
+
+
+
+
+
+
+
 
 
         if (null == data) {
@@ -198,7 +262,7 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
 
 
     @Override
-    public void onLoaderReset(@NonNull Loader<String[]> loader) {
+    public void onLoaderReset(@NonNull Loader<ArrayList<HolidayDay>> loader) {
 
     }
     /**
@@ -239,6 +303,7 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
         Log.v(TAG,"code"+code);
         return code;
     }
+
 
 
 
