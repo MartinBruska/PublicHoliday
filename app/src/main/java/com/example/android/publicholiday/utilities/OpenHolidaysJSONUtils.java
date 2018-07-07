@@ -3,9 +3,13 @@ package com.example.android.publicholiday.utilities;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.android.publicholiday.holidaysModels.HolidayDay;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public final class OpenHolidaysJSONUtils {
 /**
@@ -22,11 +26,11 @@ public final class OpenHolidaysJSONUtils {
 //TAG for logging
 private static final String TAG = OpenHolidaysJSONUtils.class.getSimpleName();
 
-public static String[] getHolidaysFromJson(Context context, String holidaysJsonStr)
+public static ArrayList<HolidayDay> getHolidaysFromJson(Context context, String holidaysJsonStr)
         throws JSONException {
 
-    /* String array to hold each holidays' day String */
-    String[] parsedHolidaysData=null;
+    /* List of holidayDay objects to hold each holidays' day object */
+    ArrayList<HolidayDay> parsedHolidaysData;
     /* Holiday information. Each holidays info is an element of the "items" array */
     final String HOL_LIST="items";
     /*Holiday name. Each holidays name is stored in the"summary" string*/
@@ -43,7 +47,7 @@ public static String[] getHolidaysFromJson(Context context, String holidaysJsonS
     /*get a array of holidays*/
     JSONArray holidayArray=holidaysJson.getJSONArray(HOL_LIST);
     /*create a array to stored a holiday data*/
-        parsedHolidaysData=new String[holidayArray.length()];
+        parsedHolidaysData=new ArrayList<HolidayDay>();
     /*iterate through array of holiday objects*/
         for(int i=0;i<holidayArray.length();i++){
 
@@ -64,8 +68,9 @@ public static String[] getHolidaysFromJson(Context context, String holidaysJsonS
             endDate=endDateObject.getString(HOL_DATE);
             Log.v(TAG,"endDate"+endDate);
 
-            parsedHolidaysData[i]=holidayName+":"+"\n"+"Start date: "+startDate+
-                                                 "\n"+"End date: "+endDate;
+            HolidayDay holidays=new HolidayDay(holidayName,startDate,endDate);
+
+            parsedHolidaysData.add(holidays);
 
 
         }

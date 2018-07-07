@@ -1,10 +1,6 @@
-package com.example.android.publicholiday;
+package com.example.android.publicholiday.adapters;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,24 +10,13 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-import com.example.android.publicholiday.utilities.NetworkUtils;
+import com.example.android.publicholiday.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
-import com.simplecityapps.recyclerview_fastscroll.views.FastScroller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.List;
 
 public class CountriesAdapter extends RecyclerView.Adapter<CountriesAdapter.CountriesAdapterViewHolder>
             implements FastScrollRecyclerView.SectionedAdapter, Filterable {

@@ -25,6 +25,15 @@
         android:layout_gravity="center"
         android:visibility="invisible"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:id="@+id/ll_button_row"
+        android:orientation="horizontal"
+        >
 
+
+    </LinearLayout>
 
 </FrameLayout>

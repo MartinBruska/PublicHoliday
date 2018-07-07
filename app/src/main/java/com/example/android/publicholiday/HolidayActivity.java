@@ -3,7 +3,6 @@ package com.example.android.publicholiday;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -18,9 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.android.publicholiday.HolidayDay;
-import com.example.android.publicholiday.HolidaysAdapter;
-import com.example.android.publicholiday.R;
+import com.example.android.publicholiday.adapters.HolidaysAdapter;
+import com.example.android.publicholiday.adapters.MonthAdapter;
+import com.example.android.publicholiday.holidaysModels.HolidayDay;
+import com.example.android.publicholiday.holidaysModels.Months;
 import com.example.android.publicholiday.utilities.DateUtils;
 import com.example.android.publicholiday.utilities.LinkingCountries;
 import com.example.android.publicholiday.utilities.NetworkUtils;
@@ -33,7 +33,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class HolidayActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<HolidayDay>> {
 
@@ -41,9 +40,13 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
 
     private String mCountry;
     private TextView mErrorMessageDisplay;
-    private HolidaysAdapter mHolidaysAdapter;
+
+
+
+    private MonthAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    private Map<String,ArrayList<HolidayDay>> dataFilteredByYear;
+    private Map<String,ArrayList<HolidayDay>> dataSortedByYear;
+    private List<Months> dataSortedByMonth;
 
 
     private ProgressBar mLoadingIndicator;
@@ -87,8 +90,9 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
         LinearLayoutManager layoutManager=new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mHolidaysAdapter=new HolidaysAdapter();
-        mRecyclerView.setAdapter(mHolidaysAdapter);
+
+
+
 
 
         /*
@@ -201,15 +205,21 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
         //getting system year
         Calendar calendar= Calendar.getInstance();
         int cYear=calendar.get(Calendar.YEAR);
-        //sort the data based on year
-        dataFilteredByYear= DateUtils.holidaysSortingByYear(data);
-        //set data for recyclerview by system year
-        mHolidaysAdapter.setHolidayData(dataFilteredByYear.get(String.valueOf(cYear)));
+        //sort the data by year
+        dataSortedByYear = DateUtils.holidaysSortingByYear(data);
+        //sort the data by month
+        dataSortedByMonth= DateUtils.holidaysSortingByMonth(dataSortedByYear.get(String.valueOf(cYear)));
+        mAdapter=new MonthAdapter(dataSortedByMonth);
+        mRecyclerView.setAdapter(mAdapter);
+
+
+
         //find the linear layout for buttons
         LinearLayout buttonLayout=(LinearLayout) findViewById(R.id.ll_button_row);
+
         //creating new buttons based on keyset and seting onclicklistener on them
-        if(dataFilteredByYear.keySet()!=null) {
-            for (final String year : dataFilteredByYear.keySet()) {
+        if(dataSortedByYear.keySet()!=null) {
+            for (final String year : dataSortedByYear.keySet()) {
                 final Button button = new Button(this);
                 button.setText(year);
                 button.setTag(year);
@@ -220,30 +230,28 @@ public class HolidayActivity extends AppCompatActivity implements LoaderManager.
                     button.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                 }
                 button.setOnClickListener(new View.OnClickListener() {
-                    boolean click=true;
+
                     @Override
                     public void onClick(View v) {
-                        mHolidaysAdapter.setHolidayData(dataFilteredByYear.get(year));
-                        if(click){
-                            button.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                            click=false;
-                        } else {
-                            button.setBackgroundColor(Color.WHITE);
-                            click=true;
-                        }
 
-
-
-                    }
+                        dataSortedByMonth= DateUtils.holidaysSortingByMonth(dataSortedByYear.get(year));
+                        mAdapter=new MonthAdapter(dataSortedByMonth);
+                        mRecyclerView.setAdapter(mAdapter);
+                        button.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                                    }
                 });
                 buttonLayout.addView(button);
-                }
+            }
         }
 
-        //
-        //TODO(2) can't see last row of recycelrview-fix it
 
-        //TODO(4) year button in different color after clicking
+
+
+
+
+        //TODO(2) can't see last row of recycelrview-fix it
+        //TODO(3) holidays are not sorted by days
+        // TODO(4) year button in different color after clicking
 
 
 
