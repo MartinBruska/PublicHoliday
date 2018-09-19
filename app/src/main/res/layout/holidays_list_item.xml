@@ -3,45 +3,51 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/list_item_selector">
+    android:layout_height="90dp"
+    android:background="@drawable/list_item_selector"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_holiday_name"
         style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="29dp"
-        android:layout_marginLeft="8dp"
+        android:layout_width="259dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Valentine" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="110dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_start_date"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        tools:text="2018-05-04"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_holiday_name" />
+        <TextView
+            android:id="@+id/tv_start_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"
+            tools:text="Jun 16" />
 
-    <TextView
-        android:id="@+id/tv_end_date"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@+id/tv_start_date"
-        app:layout_constraintTop_toBottomOf="@+id/tv_holiday_name"
-        tools:text="10-12-2017" />
+        <TextView
+            android:id="@+id/tv_week_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"
+            tools:text="Monday" />
+    </LinearLayout>
 
     <View
         android:id="@+id/view"

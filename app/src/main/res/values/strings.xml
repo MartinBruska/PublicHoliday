@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">PublicHoliday</string>
+    <string name="app_name">Public Holiday</string>
     <string name="action_search">Search</string>
     <string name="error_message">An error has occurred. Please check your connectivity</string>
     <string name="search_hint">Type country…</string>
+    <string name="split_to_months">Split to Months</string>
+    <string name="split_back_months">Back</string>
 
 </resources>
