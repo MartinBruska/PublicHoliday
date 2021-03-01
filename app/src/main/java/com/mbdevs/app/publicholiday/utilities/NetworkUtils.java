@@ -17,7 +17,7 @@ public final class NetworkUtils {
             "https://www.googleapis.com/calendar/v3/calendars/en.";
 
     private static final String HOLIDAYS_BASE_LAST_PART_URL=
-            "%23holiday%40group.v.calendar.google.com/events?key=AIzaSyANrNpY7DorvzmXaPI5XJHleWwj_e30tR4";
+            "%23holiday%40group.v.calendar.google.com/events?key=key";
 
 
 
